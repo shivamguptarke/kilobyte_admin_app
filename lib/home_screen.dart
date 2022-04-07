@@ -59,23 +59,33 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Text("Clients", style: TextStyle(fontSize: 30, letterSpacing: 2),),
               ),
               Expanded(
-                child: ListView.builder(
-                  controller: controller,
-                  shrinkWrap: true,
-                  itemCount: sampleSize + 1,
-                  itemBuilder: (context, index) => 
-                  (index<sampleSize) ? client_widget() : 
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Align(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          hasmore ? CircularProgressIndicator() : Text("No more data to load")
-                        ],
+                child: RefreshIndicator(
+                  onRefresh: () async {  
+                    setState(() {
+                      sampleSize = 7;
+                      page =1;
+                      hasmore = true;
+                      fetchMoreData();
+                    });
+                  },
+                  child: ListView.builder(
+                    controller: controller,
+                    shrinkWrap: true,
+                    itemCount: sampleSize + 1,
+                    itemBuilder: (context, index) => 
+                    (index<sampleSize) ? client_widget() : 
+                    Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Align(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            hasmore ? CircularProgressIndicator() : Text("No more data to load")
+                          ],
+                        ),
                       ),
-                    ),
-                  )
+                    )
+                  ),
                 ),
               ),
             ]
@@ -90,7 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if(dataResponse!=null)
     {
       CompanyDataModel.companyDataList = List.from(dataResponse).map<CompanyData>((typeSingle) => CompanyData.fromMap(typeSingle)).toList();
-     showToast("Data Loaded!  "  + dataResponse.toString(),Toast.LENGTH_LONG,Colors.green,Colors.white);
+     //showToast("Data Loaded!  "  + dataResponse.toString(),Toast.LENGTH_LONG,Colors.green,Colors.white);
     //  print(CompanyDataModel.companyDataList.toString() + ' -------    '  + dataResponse);
         
     }
@@ -120,7 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
         await Future.delayed(Duration(milliseconds: 2000));
         setState(() {
           isLoading = false;
-          showToast("Data Loaded!  ",Toast.LENGTH_LONG,Colors.green,Colors.white);
+       //   showToast("Data Loaded!  ",Toast.LENGTH_LONG,Colors.green,Colors.white);
           page++;
         });
       }
