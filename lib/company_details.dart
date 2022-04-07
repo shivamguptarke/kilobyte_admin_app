@@ -28,7 +28,7 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
         {
           return Material(child: Center(child: CircularProgressIndicator()));
         }
-        else if(snapshot.error==null || snapshot.hasData)
+        else if(snapshot.error!=null || snapshot.hasData)
         {
           return Container(
             child: SafeArea(

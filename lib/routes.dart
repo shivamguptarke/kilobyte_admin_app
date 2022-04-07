@@ -75,7 +75,8 @@ Future<dynamic> getDataRequest(String urlAddress) async {
       } else {
         // If the server did not return a 200 OK response,
         // then throw an exception.
-        throw Exception('Failed to load data');
+        return null;
+        //throw Exception('Failed to load data');
       }
     }on SocketException{
       print("socketexception");
