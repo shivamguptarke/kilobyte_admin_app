@@ -138,7 +138,7 @@ class _client_widgetState extends State<client_widget> {
                 IconButton(onPressed: (){}, icon: Icon(CupertinoIcons.cloud_upload_fill)),
                 IconButton(onPressed: (){
                   _pickImage();
-                }, icon: Icon(CupertinoIcons.eyedropper,))
+                }, icon: Icon(Icons.edit,))
               ],
             )
           ],

@@ -19,9 +19,11 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   String id="",password="";
+  bool _passwordVisible = false;
 
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -67,7 +69,20 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           SizedBox(height: 30,),
                           TextFormField(
+                            obscureText: !_passwordVisible,
+                            keyboardType: TextInputType.visiblePassword,
                             decoration: InputDecoration(
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                              _passwordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                              ), onPressed: () { 
+                                setState(() {
+                                  _passwordVisible = !_passwordVisible;  
+                                });
+                               },
+                              ),
                               floatingLabelBehavior: FloatingLabelBehavior.always,
                               hintText: "Enter Your Password", 
                               labelText: "Password",
