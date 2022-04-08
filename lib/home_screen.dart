@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:kilobyte_admin_app/company_details.dart';
 import 'package:kilobyte_admin_app/data/company_data.dart';
 import 'package:kilobyte_admin_app/routes.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -60,7 +61,38 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(20.0),
-                child: Text("Clients", style: TextStyle(fontSize: 30, letterSpacing: 2),),
+                child: Row(
+                  children: [
+                    Text("Clients", style: TextStyle(fontSize: 30, letterSpacing: 2),),
+                    Spacer(),
+                    IconButton(onPressed: (){
+                      Alert(
+                        context: context,
+                        type: AlertType.warning,
+                        title: "Alert",
+                        desc: "Are you sure you want to logout?",
+                        buttons: [
+                          DialogButton(
+                            child: Text(
+                              "CANCEL",
+                              style: TextStyle(fontSize: 20),
+                            ),
+                            onPressed: () => Navigator.pop(context),
+                            color: Colors.white,
+                          ),
+                          DialogButton(
+                            child: Text(
+                              "YES",
+                              style: TextStyle(color: Colors.white, fontSize: 20),
+                            ),
+                            onPressed: () => Navigator.pop(context),
+                            color: Colors.blue,
+                          )
+                        ],
+                      ).show();
+                    }, icon: Icon(Icons.logout))
+                  ],
+                ),
               ),
               Expanded(
                 child: RefreshIndicator(
