@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 // class MyRoutes{
 //   // static String splashRoute = "/";
@@ -15,7 +16,7 @@ import 'package:http/http.dart' as http;
 
 class URLS{
   static String loginUrl = "http://hmaapi.kilobytetech.com/auth/login";
-  //static String getClientsUrl = "http://hmaapi.kilobytetech.com/users?pageNo=1&size=20";
+  static String getCompanyDocumentsUrl = "http://hmaapi.kilobytetech.com/documents?clientId=5f60e62502392e786fa4ae95&financialYear=2020-2021";
 }
 
 Future<http.Response?> postDataRequest(BuildContext  context,String urlAddress, Map<String, dynamic> jsonData,) async {
@@ -55,35 +56,43 @@ Future<http.Response?> postDataRequest(BuildContext  context,String urlAddress, 
     }
 }
 
-Future<dynamic> getDataRequest(String urlAddress, String token) async {
+Future<dynamic> getDataRequest(String urlAddress) async {
     //await Future.delayed(Duration(seconds: 2));
-    try{
-      final response = await http.get(Uri.parse(urlAddress),headers: {
-        HttpHeaders.authorizationHeader : token
-      });
-      var decodeddata;
-      print(urlAddress);
-      if (response.statusCode == 200) {
-        // If the server did return a 200 OK response,
-        // then parse the JSON.
-        try{
-          decodeddata = jsonDecode(response.body);
-          //print(decodeddata.toString());
-          return decodeddata;
-        } on FormatException catch (e) {
-          print('The provided string is not valid JSON' + response.body);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if(prefs.containsKey("token"))
+    {
+      try{
+        final response = await http.get(Uri.parse(urlAddress),headers: {
+          HttpHeaders.authorizationHeader : prefs.get("token").toString()
+        });
+        var decodeddata;
+        print(urlAddress);
+        if (response.statusCode == 200) {
+          // If the server did return a 200 OK response,
+          // then parse the JSON.
+          try{
+            decodeddata = jsonDecode(response.body);
+            //print(decodeddata.toString());
+            return decodeddata;
+          } on FormatException catch (e) {
+            print('The provided string is not valid JSON' + response.body);
+            return null;
+          }
+        } else {
+          // If the server did not return a 200 OK response,
+          // then throw an exception.
           return null;
+          //throw Exception('Failed to load data');
         }
-      } else {
-        // If the server did not return a 200 OK response,
-        // then throw an exception.
+      }on SocketException{
+        print("socketexception");
         return null;
-        //throw Exception('Failed to load data');
       }
-    }on SocketException{
-      print("socketexception");
+    }else{
+      showToast("Something went wrong. Login Again!",Toast.LENGTH_LONG,Colors.red,Colors.white);
       return null;
     }
+
   }
 
   showLoaderDialog(BuildContext context){

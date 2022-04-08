@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
 import 'package:kilobyte_admin_app/company_details.dart';
 import 'package:kilobyte_admin_app/data/company_data.dart';
 import 'package:kilobyte_admin_app/routes.dart';
@@ -99,53 +100,47 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future fetchMoreData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    if(prefs.containsKey("token"))
+    var dataResponse = await getDataRequest("http://hmaapi.kilobytetech.com/users?pageNo=$page&size=20");
+    if(dataResponse!=null)
     {
-      var dataResponse = await getDataRequest("http://hmaapi.kilobytetech.com/users?pageNo=$page&size=20",prefs.get("token").toString());
-      if(dataResponse!=null)
+      try{
+      //log( ' -------    '  + dataResponse.toString());
+      log( ' -------    '  + dataResponse['records'].toString());
+      List<CompanyData> companyNewList=[];
+      companyNewList = List.from(dataResponse['records']).map<CompanyData>((company) => CompanyData.fromMap(company)).toList();
+      CompanyDataModel.companyDataList.addAll(companyNewList);
+      showToast("Data Loaded!  "  + companyNewList.length.toString() + CompanyDataModel.companyDataList.length.toString(),Toast.LENGTH_LONG,Colors.green,Colors.white);
+      if(hasmore)
       {
-        try{
-        //log( ' -------    '  + dataResponse.toString());
-        log( ' -------    '  + dataResponse['records'].toString());
-        List<CompanyData> companyNewList=[];
-        companyNewList = List.from(dataResponse['records']).map<CompanyData>((company) => CompanyData.fromMap(company)).toList();
-        CompanyDataModel.companyDataList.addAll(companyNewList);
-        showToast("Data Loaded!  "  + companyNewList.length.toString() + CompanyDataModel.companyDataList.length.toString(),Toast.LENGTH_LONG,Colors.green,Colors.white);
-        if(hasmore)
+        if(isLoading) return;
+        isLoading = true;
+        sampleSize = sampleSize+20;
+        if(companyNewList.length<limit)
         {
-          if(isLoading) return;
-          isLoading = true;
-          sampleSize = sampleSize+20;
-          if(companyNewList.length<limit)
-          {
-            hasmore = false;
-          }
-          if(maxLimit<sampleSize)
-          {
-            hasmore = false;
-          }
-          await Future.delayed(Duration(milliseconds: 2000));
-          setState(() {
-            isLoading = false;
-        //   showToast("Data Loaded!  ",Toast.LENGTH_LONG,Colors.green,Colors.white);
-            page++;
-          });
+          hasmore = false;
         }
-        log( ' -------    '  + dataResponse.toString());
-        }catch (e){
-          log(e.toString());
+        if(maxLimit<sampleSize)
+        {
+          hasmore = false;
         }
-      }else{
-        showToast("Something went wrong. Try again Later!",Toast.LENGTH_LONG,Colors.red,Colors.white);
+        await Future.delayed(Duration(milliseconds: 2000));
+        setState(() {
+          isLoading = false;
+      //   showToast("Data Loaded!  ",Toast.LENGTH_LONG,Colors.green,Colors.white);
+          page++;
+        });
       }
-      setState(() {
-        //showToast("Data Loaded!  "  + dataResponse.toString(),Toast.LENGTH_LONG,Colors.green,Colors.white);
-        page++;
-      });
+      log( ' -------    '  + dataResponse.toString());
+      }catch (e){
+        log(e.toString());
+      }
     }else{
-      showToast("Something went wrong. Login Again!",Toast.LENGTH_LONG,Colors.red,Colors.white);
+      showToast("Something went wrong. Try again Later!",Toast.LENGTH_LONG,Colors.red,Colors.white);
     }
+    setState(() {
+      //showToast("Data Loaded!  "  + dataResponse.toString(),Toast.LENGTH_LONG,Colors.green,Colors.white);
+      page++;
+    });
   }
 }
 
@@ -157,6 +152,12 @@ class client_widget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    String temp='';
+    for (var item in companyData.communicationEmails) {
+      temp = temp + item + ", " ;
+    }
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -176,10 +177,11 @@ class client_widget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text("#" + companyData.clientID, style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w800),),
                     Spacer(),
-                    Expanded(child: Text("Created On : " , style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w800),)),
+                    Text("Created On : " +  DateFormat('dd-MM-yy, hh:mm a').format(DateTime.parse(companyData.updatedAt)), style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w800),),
                   ],
                 ),
                 SizedBox(height: 10,),
@@ -188,7 +190,7 @@ class client_widget extends StatelessWidget {
                 Row(
                   children: [
                     Text("Assigned Members : ", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w800),),
-                    Text("Prakhar Gupta"),
+                    Expanded(child: Text(companyData.communicationEmails.isNotEmpty ? temp : "NONE")),
                   ],
                 ),
               ],

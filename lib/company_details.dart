@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'dart:ui';
 
@@ -63,7 +64,7 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
                           Navigator.pop(context);
                         }, icon: Icon(CupertinoIcons.back)),
                         SizedBox(width: 10,),
-                        Text("Company Details", style: TextStyle(fontSize: 20, letterSpacing: 2),),
+                        Text("Company Documents", style: TextStyle(fontSize: 20, letterSpacing: 2),),
                       ],
                     ),
                     Expanded(
@@ -88,15 +89,15 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
   }
 
   Future? loadClientsData() async {
-    //var dataResponse = await getDataRequest("http://hmaapi.kilobytetech.com/users?pageNo=1&size=20");
-    // if(dataResponse!=null)
-    // {
-    //  showToast("Data Loaded!  "  + dataResponse.toString(),Toast.LENGTH_LONG,Colors.green,Colors.white);
-    //   //ServiceTypeDataModel.serviceTypeDataList = List.from(dataResponse).map<ServiceTypeData>((typeSingle) => ServiceTypeData.fromMap(typeSingle)).toList();
-    // //  print(AllCategoryDataModel.AllCategoryDataList.toString() + ' -------    '  + AllCategoryDataModel.AllCategoryDataList[0].category.toString());
-    //     //showToast("Data Loaded!  "  + ServiceTypeDataModel.serviceTypeDataList.toString(),Toast.LENGTH_LONG,Colors.green,Colors.white);
-    // }
-    // return dataResponse;
+    var dataResponse = await getDataRequest("http://hmaapi.kilobytetech.com/documents?clientId=5f60e62502392e786fa4ae95&financialYear=2020-2021",);
+    if(dataResponse!=null)
+    {
+     log("Data Loaded!  "  + dataResponse.toString());
+      //ServiceTypeDataModel.serviceTypeDataList = List.from(dataResponse).map<ServiceTypeData>((typeSingle) => ServiceTypeData.fromMap(typeSingle)).toList();
+    //  print(AllCategoryDataModel.AllCategoryDataList.toString() + ' -------    '  + AllCategoryDataModel.AllCategoryDataList[0].category.toString());
+        //showToast("Data Loaded!  "  + ServiceTypeDataModel.serviceTypeDataList.toString(),Toast.LENGTH_LONG,Colors.green,Colors.white);
+    }
+    return dataResponse;
   }
 }
 
