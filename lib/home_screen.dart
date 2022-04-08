@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
@@ -6,6 +7,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:kilobyte_admin_app/company_details.dart';
 import 'package:kilobyte_admin_app/data/company_data.dart';
 import 'package:kilobyte_admin_app/routes.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({ Key? key }) : super(key: key);
@@ -24,6 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
+    fetchMoreData();
     // TODO: implement initState
     controller.addListener(() {
       if(controller.position.maxScrollExtent==controller.offset)
@@ -71,9 +74,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: ListView.builder(
                     controller: controller,
                     shrinkWrap: true,
-                    itemCount: sampleSize + 1,
+                    itemCount: CompanyDataModel.companyDataList.length + 1,
                     itemBuilder: (context, index) => 
-                    (index<sampleSize) ? client_widget() : 
+                    (index<CompanyDataModel.companyDataList.length) ? client_widget(companyData : CompanyDataModel.companyDataList.elementAt(index)) : 
                     Padding(
                       padding: const EdgeInsets.all(20.0),
                       child: Align(
@@ -95,58 +98,61 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Future? loadClientsData() async {
-    var dataResponse = await getDataRequest(URLS.getClientsUrl);
-    if(dataResponse!=null)
-    {
-      CompanyDataModel.companyDataList = List.from(dataResponse).map<CompanyData>((typeSingle) => CompanyData.fromMap(typeSingle)).toList();
-     //showToast("Data Loaded!  "  + dataResponse.toString(),Toast.LENGTH_LONG,Colors.green,Colors.white);
-    //  print(CompanyDataModel.companyDataList.toString() + ' -------    '  + dataResponse);
-        
-    }
-    return dataResponse;
-  }
-
   Future fetchMoreData() async {
-    //var dataResponse = await getDataRequest("http://hmaapi.kilobytetech.com/users?pageNo=$page&size=20");
-    // if(dataResponse==null)
-    // {
-      // List<CompanyData> companyNewList;
-      // companyNewList = List.from(dataResponse).map<CompanyData>((typeSingle) => CompanyData.fromMap(typeSingle)).toList();
-      // CompanyDataModel.companyDataList.addAll(companyNewList);
-      if(hasmore)
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if(prefs.containsKey("token"))
+    {
+      var dataResponse = await getDataRequest("http://hmaapi.kilobytetech.com/users?pageNo=$page&size=20",prefs.get("token").toString());
+      if(dataResponse!=null)
       {
-        if(isLoading) return;
-        isLoading = true;
-        sampleSize = sampleSize+10;
-        // if(companyNewList.length<limit)
-        // {
-        //   hasmore = false;
-        // }
-        if(maxLimit<sampleSize)
+        try{
+        //log( ' -------    '  + dataResponse.toString());
+        log( ' -------    '  + dataResponse['records'].toString());
+        List<CompanyData> companyNewList=[];
+        companyNewList = List.from(dataResponse['records']).map<CompanyData>((company) => CompanyData.fromMap(company)).toList();
+        CompanyDataModel.companyDataList.addAll(companyNewList);
+        showToast("Data Loaded!  "  + companyNewList.length.toString() + CompanyDataModel.companyDataList.length.toString(),Toast.LENGTH_LONG,Colors.green,Colors.white);
+        if(hasmore)
         {
-          hasmore = false;
+          if(isLoading) return;
+          isLoading = true;
+          sampleSize = sampleSize+20;
+          if(companyNewList.length<limit)
+          {
+            hasmore = false;
+          }
+          if(maxLimit<sampleSize)
+          {
+            hasmore = false;
+          }
+          await Future.delayed(Duration(milliseconds: 2000));
+          setState(() {
+            isLoading = false;
+        //   showToast("Data Loaded!  ",Toast.LENGTH_LONG,Colors.green,Colors.white);
+            page++;
+          });
         }
-        await Future.delayed(Duration(milliseconds: 2000));
-        setState(() {
-          isLoading = false;
-       //   showToast("Data Loaded!  ",Toast.LENGTH_LONG,Colors.green,Colors.white);
-          page++;
-        });
+        log( ' -------    '  + dataResponse.toString());
+        }catch (e){
+          log(e.toString());
+        }
+      }else{
+        showToast("Something went wrong. Try again Later!",Toast.LENGTH_LONG,Colors.red,Colors.white);
       }
-      //  print(CompanyDataModel.companyDataList.toString() + ' -------    '  + dataResponse);
-    // }
-    // setState(() {
-    //     showToast("Data Loaded!  "  + dataResponse.toString(),Toast.LENGTH_LONG,Colors.green,Colors.white);
-    //     page++;
-    //   });
-    // return dataResponse;
+      setState(() {
+        //showToast("Data Loaded!  "  + dataResponse.toString(),Toast.LENGTH_LONG,Colors.green,Colors.white);
+        page++;
+      });
+    }else{
+      showToast("Something went wrong. Login Again!",Toast.LENGTH_LONG,Colors.red,Colors.white);
+    }
   }
 }
 
 class client_widget extends StatelessWidget {
+  final CompanyData companyData;
   const client_widget({
-    Key? key,
+    Key? key, required this.companyData,
   }) : super(key: key);
 
   @override
@@ -171,13 +177,13 @@ class client_widget extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Text("#HMA4231", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w800),),
+                    Text("#" + companyData.clientID, style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w800),),
                     Spacer(),
-                    Text("Created On : 10/08/2021", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w800),),
+                    Expanded(child: Text("Created On : " , style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w800),)),
                   ],
                 ),
                 SizedBox(height: 10,),
-                Text("SG Enterprises", style: TextStyle(color: Colors.blue, fontWeight: FontWeight.w800, fontSize: 15),),
+                Text(companyData.companyName, style: TextStyle(color: Colors.blue, fontWeight: FontWeight.w800, fontSize: 15),),
                 SizedBox(height: 10,),
                 Row(
                   children: [

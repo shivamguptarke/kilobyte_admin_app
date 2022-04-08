@@ -88,15 +88,15 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
   }
 
   Future? loadClientsData() async {
-    var dataResponse = await getDataRequest(URLS.getClientsUrl);
-    if(dataResponse!=null)
-    {
-     showToast("Data Loaded!  "  + dataResponse.toString(),Toast.LENGTH_LONG,Colors.green,Colors.white);
-      //ServiceTypeDataModel.serviceTypeDataList = List.from(dataResponse).map<ServiceTypeData>((typeSingle) => ServiceTypeData.fromMap(typeSingle)).toList();
-    //  print(AllCategoryDataModel.AllCategoryDataList.toString() + ' -------    '  + AllCategoryDataModel.AllCategoryDataList[0].category.toString());
-        //showToast("Data Loaded!  "  + ServiceTypeDataModel.serviceTypeDataList.toString(),Toast.LENGTH_LONG,Colors.green,Colors.white);
-    }
-    return dataResponse;
+    //var dataResponse = await getDataRequest("http://hmaapi.kilobytetech.com/users?pageNo=1&size=20");
+    // if(dataResponse!=null)
+    // {
+    //  showToast("Data Loaded!  "  + dataResponse.toString(),Toast.LENGTH_LONG,Colors.green,Colors.white);
+    //   //ServiceTypeDataModel.serviceTypeDataList = List.from(dataResponse).map<ServiceTypeData>((typeSingle) => ServiceTypeData.fromMap(typeSingle)).toList();
+    // //  print(AllCategoryDataModel.AllCategoryDataList.toString() + ' -------    '  + AllCategoryDataModel.AllCategoryDataList[0].category.toString());
+    //     //showToast("Data Loaded!  "  + ServiceTypeDataModel.serviceTypeDataList.toString(),Toast.LENGTH_LONG,Colors.green,Colors.white);
+    // }
+    // return dataResponse;
   }
 }
 

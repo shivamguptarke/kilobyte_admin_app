@@ -6,19 +6,19 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 
-class MyRoutes{
-  // static String splashRoute = "/";
-  // static String loginRoute = "/login";
-  // static String homeRoute = "/home";
-  //static String initialUrlRoute = "http://hmaapi.kilobytetech.com/auth/login";
-}
+// class MyRoutes{
+//   // static String splashRoute = "/";
+//   // static String loginRoute = "/login";
+//   // static String homeRoute = "/home";
+//   //static String initialUrlRoute = "http://hmaapi.kilobytetech.com/auth/login";
+// }
 
 class URLS{
   static String loginUrl = "http://hmaapi.kilobytetech.com/auth/login";
-  static String getClientsUrl = "http://hmaapi.kilobytetech.com/users?pageNo=1&size=20";
+  //static String getClientsUrl = "http://hmaapi.kilobytetech.com/users?pageNo=1&size=20";
 }
 
-Future<String?> postDataRequest(BuildContext  context,String urlAddress, Map<String, dynamic> jsonData,) async {
+Future<http.Response?> postDataRequest(BuildContext  context,String urlAddress, Map<String, dynamic> jsonData,) async {
     print(urlAddress + jsonData.toString());
     String? dataResponse;
 
@@ -39,14 +39,14 @@ Future<String?> postDataRequest(BuildContext  context,String urlAddress, Map<Str
       log("-----------------"+ response.body);
       print(response.statusCode);
 
-      if (response.statusCode == 200) {
-        //showToast("Saved Data Successfully",Toast.LENGTH_LONG,Colors.green,Colors.white);
-        } else {
-          //showToast("Request Failed. Try Again Later!",Toast.LENGTH_LONG,Colors.red,Colors.white);
-          dataResponse = null;
-          //throw Exception('Failed to Post Data Request');
-      }
-      return dataResponse;
+      // if (response.statusCode != 200) {
+      //   dataResponse = jsonDecode(response.body)['reason'];
+      //   //showToast("Saved Data Successfully",Toast.LENGTH_LONG,Colors.green,Colors.white);
+      //   } else {
+      //     //showToast("Request Failed. Try Again Later!",Toast.LENGTH_LONG,Colors.red,Colors.white);
+      //     //throw Exception('Failed to Post Data Request');
+      // }
+      return response;
     }on SocketException{
       Navigator.pop(context);
       print("socketexception");
@@ -55,10 +55,12 @@ Future<String?> postDataRequest(BuildContext  context,String urlAddress, Map<Str
     }
 }
 
-Future<dynamic> getDataRequest(String urlAddress) async {
+Future<dynamic> getDataRequest(String urlAddress, String token) async {
     //await Future.delayed(Duration(seconds: 2));
     try{
-      final response = await http.get(Uri.parse(urlAddress));
+      final response = await http.get(Uri.parse(urlAddress),headers: {
+        HttpHeaders.authorizationHeader : token
+      });
       var decodeddata;
       print(urlAddress);
       if (response.statusCode == 200) {
@@ -66,7 +68,7 @@ Future<dynamic> getDataRequest(String urlAddress) async {
         // then parse the JSON.
         try{
           decodeddata = jsonDecode(response.body);
-          print(decodeddata.toString());
+          //print(decodeddata.toString());
           return decodeddata;
         } on FormatException catch (e) {
           print('The provided string is not valid JSON' + response.body);
@@ -106,7 +108,7 @@ Future<dynamic> getDataRequest(String urlAddress) async {
     Fluttertoast.showToast(
         msg: message,
         toastLength: tLength,
-        gravity: ToastGravity.CENTER,
+        gravity: ToastGravity.BOTTOM,
         timeInSecForIosWeb: 5,
         backgroundColor: bgcolor,
         textColor: txtcolor,

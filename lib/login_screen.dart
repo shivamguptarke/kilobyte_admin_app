@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart';
 import 'package:kilobyte_admin_app/routes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -125,17 +126,24 @@ class _LoginScreenState extends State<LoginScreen> {
   moveToHome (BuildContext context) async {
       if(_formKey.currentState!.validate())
       {
-        String? response = await postDataRequest(context, URLS.loginUrl, {"email":id,"password":password});
+        Response? response = await postDataRequest(context, URLS.loginUrl, {"email":id,"password":password});
         if(response!=null)
         {
           try{
-            var decodedData = jsonDecode(response);  
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            await prefs.setBool("LoggedIn", true);
-            await prefs.setString("email", decodedData["email"]);
-            Navigator.push(context, MaterialPageRoute(builder: (context)=>HomeScreen()));
-            //Navigator.pushReplacementNamed(context, MyRoutes.homeRoute);
-            showToast("Logged In Successfully!", Toast.LENGTH_SHORT, Colors.green, Colors.white);
+            if(response.statusCode==200)
+            {  
+              var decodedData = jsonDecode(response.body);  
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              await prefs.setBool("LoggedIn", true);
+              await prefs.setString("email", decodedData["email"]);
+              await prefs.setString("token", decodedData["token"]);
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>HomeScreen()));
+              //Navigator.pushReplacementNamed(context, MyRoutes.homeRoute);
+              showToast("Logged In Successfully!", Toast.LENGTH_SHORT, Colors.green, Colors.white);
+            }else{
+              var decodedData = jsonDecode(response.body);
+              showToast(decodedData['reason'], Toast.LENGTH_SHORT, Colors.green, Colors.white);
+            }
           } on FormatException catch (e) {
             print(response);
             showToast("Invalid Id or Password", Toast.LENGTH_SHORT, Colors.red, Colors.white);  
@@ -143,7 +151,7 @@ class _LoginScreenState extends State<LoginScreen> {
         }else{
           showToast("Request Failed. Try Again Later!", Toast.LENGTH_SHORT, Colors.red, Colors.white);
         }
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>HomeScreen()));
+        //Navigator.push(context, MaterialPageRoute(builder: (context)=>HomeScreen()));
       }      
   }
 
