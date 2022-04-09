@@ -6,10 +6,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:kilobyte_admin_app/data/company_data.dart';
 import 'package:kilobyte_admin_app/routes.dart';
 
 class CompanyDetailScreen extends StatefulWidget {
-  const CompanyDetailScreen({ Key? key }) : super(key: key);
+  final CompanyData companyData;
+  const CompanyDetailScreen({ Key? key, required this.companyData }) : super(key: key);
 
   @override
   State<CompanyDetailScreen> createState() => _CompanyDetailScreenState();
@@ -29,7 +31,7 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
         {
           return Material(child: Center(child: CircularProgressIndicator()));
         }
-        else if(snapshot.error!=null || snapshot.hasData)
+        else if(snapshot.error!=null || !snapshot.hasData)
         {
           return Container(
             child: SafeArea(
@@ -64,7 +66,7 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
                           Navigator.pop(context);
                         }, icon: Icon(CupertinoIcons.back)),
                         SizedBox(width: 10,),
-                        Text("Company Documents", style: TextStyle(fontSize: 20, letterSpacing: 2),),
+                        Text(widget.companyData.companyName, style: TextStyle(fontSize: 20, letterSpacing: 2),),
                       ],
                     ),
                     Expanded(
@@ -89,7 +91,7 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
   }
 
   Future? loadClientsData() async {
-    var dataResponse = await getDataRequest("http://hmaapi.kilobytetech.com/documents?clientId=5f60e62502392e786fa4ae95&financialYear=2020-2021",);
+    var dataResponse = await getDataRequest("http://hmaapi.kilobytetech.com/documents?clientId=${widget.companyData.id}&financialYear=2020-2021",);
     if(dataResponse!=null)
     {
      log("Data Loaded!  "  + dataResponse.toString());

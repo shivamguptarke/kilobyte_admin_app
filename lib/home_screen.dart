@@ -7,6 +7,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:kilobyte_admin_app/company_details.dart';
 import 'package:kilobyte_admin_app/data/company_data.dart';
+import 'package:kilobyte_admin_app/login_screen.dart';
 import 'package:kilobyte_admin_app/routes.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,7 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final _formKey = GlobalKey<FormState>();
   String id="",password="";
   int page = 1;
-  int sampleSize = 7, limit = 10, maxLimit = 50;
+  int limit = 20, maxLimit = 50;
   bool hasmore = true, isLoading = false;
 
   @override
@@ -54,13 +55,16 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: SafeArea(
         child: Container(
-          
-          color: Colors.white10,
+          color: Colors.white,
           child : Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(20.0),
+              Container(
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [BoxShadow(color: Colors.blue.withOpacity(.3), blurRadius: 20, offset: Offset(0,10))]
+                ),
                 child: Row(
                   children: [
                     Text("Clients", style: TextStyle(fontSize: 30, letterSpacing: 2),),
@@ -85,7 +89,12 @@ class _HomeScreenState extends State<HomeScreen> {
                               "YES",
                               style: TextStyle(color: Colors.white, fontSize: 20),
                             ),
-                            onPressed: () => Navigator.pop(context),
+                            onPressed: () async {
+                              SharedPreferences prefs = await SharedPreferences.getInstance();
+                              await prefs.clear();
+                               Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
+                                LoginScreen()), (Route<dynamic> route) => false);
+                            },
                             color: Colors.blue,
                           )
                         ],
@@ -98,9 +107,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: RefreshIndicator(
                   onRefresh: () async {  
                     setState(() {
-                      sampleSize = 7;
-                      page =1;
+                      page = 1;
                       hasmore = true;
+                      CompanyDataModel.companyDataList.clear();
                       fetchMoreData();
                     });
                   },
@@ -132,26 +141,24 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future fetchMoreData() async {
-    var dataResponse = await getDataRequest("http://hmaapi.kilobytetech.com/users?pageNo=$page&size=20");
+    var dataResponse = await getDataRequest("http://hmaapi.kilobytetech.com/users?pageNo=$page&size=$limit");
     if(dataResponse!=null)
     {
       try{
+        maxLimit = dataResponse['_metaData']['total_count'];
+        limit = dataResponse['_metaData']['per_page'];
       //log( ' -------    '  + dataResponse.toString());
-      log( ' -------    '  + dataResponse['records'].toString());
-      List<CompanyData> companyNewList=[];
-      companyNewList = List.from(dataResponse['records']).map<CompanyData>((company) => CompanyData.fromMap(company)).toList();
+      //log( ' -------    '  + dataResponse['records'].toString());
+      log(maxLimit.toString() + limit.toString());
+      List<CompanyData> companyNewList = List.from(dataResponse['records']).map<CompanyData>((company) => CompanyData.fromMap(company)).toList();
       CompanyDataModel.companyDataList.addAll(companyNewList);
-      showToast("Data Loaded!  "  + companyNewList.length.toString() + CompanyDataModel.companyDataList.length.toString(),Toast.LENGTH_LONG,Colors.green,Colors.white);
+      //showToast("Data Loaded!  "  + companyNewList.length.toString() + CompanyDataModel.companyDataList.length.toString(),Toast.LENGTH_LONG,Colors.green,Colors.white);
       if(hasmore)
       {
         if(isLoading) return;
         isLoading = true;
-        sampleSize = sampleSize+20;
+        log("-------------company list size---------" + CompanyDataModel.companyDataList.length.toString());
         if(companyNewList.length<limit)
-        {
-          hasmore = false;
-        }
-        if(maxLimit<sampleSize)
         {
           hasmore = false;
         }
@@ -169,10 +176,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }else{
       showToast("Something went wrong. Try again Later!",Toast.LENGTH_LONG,Colors.red,Colors.white);
     }
-    setState(() {
-      //showToast("Data Loaded!  "  + dataResponse.toString(),Toast.LENGTH_LONG,Colors.green,Colors.white);
-      page++;
-    });
   }
 }
 
@@ -196,12 +199,12 @@ class client_widget extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         boxShadow: [BoxShadow(color: Colors.blue.withOpacity(.3), blurRadius: 20, offset: Offset(0,10))]
       ),
-      margin: EdgeInsets.only(bottom: 20, left: 20, right: 20),
+      margin: EdgeInsets.only(bottom: 10, top: 10, left: 10, right: 10),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context)=>CompanyDetailScreen()));
+            Navigator.push(context, MaterialPageRoute(builder: (context)=>CompanyDetailScreen(companyData: companyData)));
           },
           child: Padding(
             padding: const EdgeInsets.all(15.0),
