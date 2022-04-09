@@ -92,8 +92,53 @@ Future<dynamic> getDataRequest(String urlAddress) async {
       showToast("Something went wrong. Login Again!",Toast.LENGTH_LONG,Colors.red,Colors.white);
       return null;
     }
-
   }
+
+  Future<http.Response?> putDataRequest(BuildContext  context,String urlAddress, Map<String, dynamic> jsonData,) async {
+    print(urlAddress + jsonData.toString());
+    String? dataResponse;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    try{
+      if(prefs.containsKey("token"))
+      {
+        showLoaderDialog(context);
+        final http.Response response = await http.put(
+          Uri.parse(urlAddress),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+            HttpHeaders.authorizationHeader : prefs.get("token").toString()
+          },
+          //pass data
+          body: jsonEncode(jsonData) ,
+        );
+
+        Navigator.pop(context);
+      
+        dataResponse = response.body;
+        log("-----------------"+ response.body);
+        print(response.statusCode);
+
+        // if (response.statusCode != 200) {
+        //   dataResponse = jsonDecode(response.body)['reason'];
+        //   //showToast("Saved Data Successfully",Toast.LENGTH_LONG,Colors.green,Colors.white);
+        //   } else {
+        //     //showToast("Request Failed. Try Again Later!",Toast.LENGTH_LONG,Colors.red,Colors.white);
+        //     //throw Exception('Failed to Post Data Request');
+        // }
+        return response;
+      }
+      else{
+        showToast("Something went wrong. Login Again!",Toast.LENGTH_LONG,Colors.red,Colors.white);
+        return null;
+      }
+    }on SocketException{
+      Navigator.pop(context);
+      print("socketexception");
+      //showToast("Network Connection Failed",Toast.LENGTH_LONG,Colors.red,Colors.white);
+      return null;
+    }
+  }
+
 
   showLoaderDialog(BuildContext context){
     AlertDialog alert=AlertDialog(
