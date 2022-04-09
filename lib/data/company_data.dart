@@ -79,7 +79,7 @@ class CompanyData {
 
   factory CompanyData.fromMap(Map<String, dynamic> map) {
     return CompanyData(
-      id: map['id'] ?? '',
+      id: map['_id'] ?? '',
       name: map['name'] ?? '',
       companyName: map['companyName'] ?? '',
       members: map['members'] ?? '',

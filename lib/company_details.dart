@@ -91,15 +91,21 @@ class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
   }
 
   Future? loadClientsData() async {
-    var dataResponse = await getDataRequest("http://hmaapi.kilobytetech.com/documents?clientId=${widget.companyData.id}&financialYear=2020-2021",);
-    if(dataResponse!=null)
+    log("--------- pass data------" + widget.companyData.id);
+    if(widget.companyData.id.isNotEmpty)
     {
-     log("Data Loaded!  "  + dataResponse.toString());
-      //ServiceTypeDataModel.serviceTypeDataList = List.from(dataResponse).map<ServiceTypeData>((typeSingle) => ServiceTypeData.fromMap(typeSingle)).toList();
-    //  print(AllCategoryDataModel.AllCategoryDataList.toString() + ' -------    '  + AllCategoryDataModel.AllCategoryDataList[0].category.toString());
-        //showToast("Data Loaded!  "  + ServiceTypeDataModel.serviceTypeDataList.toString(),Toast.LENGTH_LONG,Colors.green,Colors.white);
+      var dataResponse = await getDataRequest("http://hmaapi.kilobytetech.com/documents?clientId=${widget.companyData.id}&financialYear=2020-2021",);
+      if(dataResponse!=null)
+      {
+      log("Data Loaded!  "  + dataResponse.toString());
+        //ServiceTypeDataModel.serviceTypeDataList = List.from(dataResponse).map<ServiceTypeData>((typeSingle) => ServiceTypeData.fromMap(typeSingle)).toList();
+      //  print(AllCategoryDataModel.AllCategoryDataList.toString() + ' -------    '  + AllCategoryDataModel.AllCategoryDataList[0].category.toString());
+          //showToast("Data Loaded!  "  + ServiceTypeDataModel.serviceTypeDataList.toString(),Toast.LENGTH_LONG,Colors.green,Colors.white);
+          return dataResponse;
+      }
+      return null;
     }
-    return dataResponse;
+    return null;
   }
 }
 
