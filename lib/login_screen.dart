@@ -137,7 +137,7 @@ class _LoginScreenState extends State<LoginScreen> {
               await prefs.setBool("LoggedIn", true);
               await prefs.setString("email", decodedData["email"]);
               await prefs.setString("token", decodedData["token"]);
-              Navigator.push(context, MaterialPageRoute(builder: (context)=>HomeScreen()));
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>HomeScreen()));
               //Navigator.pushReplacementNamed(context, MyRoutes.homeRoute);
               showToast("Logged In Successfully!", Toast.LENGTH_SHORT, Colors.green, Colors.white);
             }else{
