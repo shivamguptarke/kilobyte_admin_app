@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 class CompanyDocuments {
+  final String id;
+  final bool primary;
   final String category;
   final String docType;
   final String type;
@@ -15,6 +17,8 @@ class CompanyDocuments {
   final String uploadedBy;
   final List<FolderData> folder;
   CompanyDocuments({
+    required this.id,
+    required this.primary,
     required this.category,
     required this.docType,
     required this.type,
@@ -27,9 +31,11 @@ class CompanyDocuments {
     required this.uploadedBy,
     required this.folder,
   });
-  
+
 
   CompanyDocuments copyWith({
+    String? id,
+    bool? primary,
     String? category,
     String? docType,
     String? type,
@@ -43,6 +49,8 @@ class CompanyDocuments {
     List<FolderData>? folder,
   }) {
     return CompanyDocuments(
+      id: id ?? this.id,
+      primary: primary ?? this.primary,
       category: category ?? this.category,
       docType: docType ?? this.docType,
       type: type ?? this.type,
@@ -59,6 +67,8 @@ class CompanyDocuments {
 
   Map<String, dynamic> toMap() {
     return {
+      'id': id,
+      'primary': primary,
       'category': category,
       'docType': docType,
       'type': type,
@@ -75,6 +85,8 @@ class CompanyDocuments {
 
   factory CompanyDocuments.fromMap(Map<String, dynamic> map) {
     return CompanyDocuments(
+      id: map['_id'] ?? '',
+      primary: map['primary'] ?? false,
       category: map['category'] ?? '',
       docType: map['docType'] ?? '',
       type: map['type'] ?? '',
@@ -95,7 +107,7 @@ class CompanyDocuments {
 
   @override
   String toString() {
-    return 'CompanyDocuments(category: $category, docType: $docType, type: $type, financialYear: $financialYear, point: $point, month: $month, status: $status, createdAt: $createdAt, updatedAt: $updatedAt, uploadedBy: $uploadedBy, folder: $folder)';
+    return 'CompanyDocuments(id: $id, primary: $primary, category: $category, docType: $docType, type: $type, financialYear: $financialYear, point: $point, month: $month, status: $status, createdAt: $createdAt, updatedAt: $updatedAt, uploadedBy: $uploadedBy, folder: $folder)';
   }
 
   @override
@@ -103,6 +115,8 @@ class CompanyDocuments {
     if (identical(this, other)) return true;
   
     return other is CompanyDocuments &&
+      other.id == id &&
+      other.primary == primary &&
       other.category == category &&
       other.docType == docType &&
       other.type == type &&
@@ -118,7 +132,9 @@ class CompanyDocuments {
 
   @override
   int get hashCode {
-    return category.hashCode ^
+    return id.hashCode ^
+      primary.hashCode ^
+      category.hashCode ^
       docType.hashCode ^
       type.hashCode ^
       financialYear.hashCode ^
