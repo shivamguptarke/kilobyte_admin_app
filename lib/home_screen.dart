@@ -162,7 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
         {
           hasmore = false;
         }
-        await Future.delayed(Duration(milliseconds: 2000));
+        //await Future.delayed(Duration(milliseconds: 2000));
         setState(() {
           isLoading = false;
       //   showToast("Data Loaded!  ",Toast.LENGTH_LONG,Colors.green,Colors.white);

@@ -23,7 +23,7 @@ class CompanyDetailScreen extends StatefulWidget {
 
 class _CompanyDetailScreenState extends State<CompanyDetailScreen> {
   String financialYearValue = '';
-  List<String> financialYearList = ['2018-2019', '2019-2020', '2020-2021', '2021-2022'];
+  List<String> financialYearList = ['2022-2023','2021-2022', '2020-2021', '2019-2020', '2018-2019'];
   List<CompanyDocuments> companyDocumentsList=[];
 
   @override

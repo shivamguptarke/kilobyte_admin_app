@@ -142,7 +142,7 @@ class _LoginScreenState extends State<LoginScreen> {
               showToast("Logged In Successfully!", Toast.LENGTH_SHORT, Colors.green, Colors.white);
             }else{
               var decodedData = jsonDecode(response.body);
-              showToast(decodedData['reason'], Toast.LENGTH_SHORT, Colors.green, Colors.white);
+              showToast(decodedData['reason'], Toast.LENGTH_SHORT, Colors.red, Colors.white);
             }
           } on FormatException catch (e) {
             print(response);
